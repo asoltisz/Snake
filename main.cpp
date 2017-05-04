@@ -14,8 +14,14 @@ SDL_Renderer* gRenderer = NULL;
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
+class Object;
+class Fruit;
+class Snake;
+class Entry;
+class Highscores;
 bool init();
 void close();
+bool mainMenu(Highscores&);
 
 class Object{
   public:
@@ -35,7 +41,7 @@ class Object{
     virtual void render(){}
 };
 
-class Fruit{
+class Fruit : public Object{
   public:
     Object fruit;
     bool eaten;
@@ -49,8 +55,8 @@ class Fruit{
       eaten = false;
       //place the fruit at a random location on the canvas that is a multiple of
       //the size of the snake's segments
-      fruit.x_position = rand() % SCREEN_WIDTH;
-      fruit.x_position -= fruit.x_position % fruit.width;
+      fruit.x_position = rand() % SCREEN_WIDTH; //x range - 0 to screen width
+      fruit.x_position -= fruit.x_position % fruit.width; //subtract the width of the object
       fruit.y_position = rand() % SCREEN_HEIGHT;
       fruit.y_position -= fruit.y_position % fruit.height;
     }
@@ -73,7 +79,7 @@ class Fruit{
     }
 };
 
-class Snake{
+class Snake : public Object{
   public:
     std::vector<Object> body;
     bool pauseGame;
@@ -237,11 +243,11 @@ class Entry{
     int score;
 };
 
-class Highscores{
+class Database{
   public:
     std::vector<Entry> scores;
 
-    Highscores(){}
+    Database(){}
 
     //function for printing all of 'scores' contents
     void printAll(){
@@ -341,7 +347,7 @@ void close(){
   SDL_Quit();
 }
 
-bool mainMenu(Highscores& myScores){
+bool mainMenu(Database& myScores){
   bool ready2play = false;
   std::string command;
   while(!ready2play){
@@ -370,7 +376,7 @@ bool mainMenu(Highscores& myScores){
 }
 
 int main(int argc, char* args[]){
-  Highscores myScores;
+  Database myScores;
   bool quit = false;
   printf("\n\n\n***** SNAKE *****\n");
   quit = mainMenu(myScores);
@@ -393,7 +399,7 @@ int main(int argc, char* args[]){
         }
 
       //game behavior
-      if(updateCount % 30 == 0 && !snake.pauseGame){
+      if(updateCount % 30 == 0 && !snake.pauseGame){ //move the snake every 30 loops
         if(snake.eat(fruit)){
           fruit.place();
           printf("Score: %i\n", snake.score);
